@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 from scipy.stats import skew
 from scipy.signal import find_peaks
+from scipy.signal import welch
 
 from sklearn.base import BaseEstimator, TransformerMixin
 
@@ -229,6 +230,8 @@ def train_make_data(X, y, window_size: int = 360, stride: int = 360):
         windows_df[col] = windows_df[col].apply(lambda x: x[0])
     
     df = windows_df
+    df['welch_f'] = df['RSSI'].apply(lambda x: welch(x)).str[0]
+    df['welch_psd'] = df['RSSI'].apply(lambda x: welch(x)).str[1]
     df['change'] = df.Num_People.apply(lambda x: (len(np.unique(x)) > 1))
     dfx = df[~df['change']]
     df = dfx.copy()
